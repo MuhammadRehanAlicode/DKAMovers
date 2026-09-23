@@ -332,17 +332,31 @@ document.querySelectorAll(".faq-item").forEach(item => {
   });
 });
 
-/* ---------- Navbar scroll shadow ---------- */
+/* ---------- Navbar scroll shadow + shipment route progress ---------- */
 const navEl = document.getElementById("mainNav");
-window.addEventListener("scroll", () => {
+const routeFillEl = document.getElementById("routeFill");
+const routeTruckEl = document.getElementById("routeTruck");
+const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function updateOnScroll() {
   if (navEl) navEl.classList.toggle("nav-scrolled", window.scrollY > 30);
   const backTop = document.getElementById("backToTop");
   if (backTop) backTop.classList.toggle("show-btt", window.scrollY > 700);
-});
+
+  if (routeFillEl && routeTruckEl) {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+    routeFillEl.style.width = pct + "%";
+    routeTruckEl.style.left = pct + "%";
+  }
+}
+window.addEventListener("scroll", updateOnScroll, { passive: true });
+updateOnScroll();
 
 /* ---------- Back to top ---------- */
 document.getElementById("backToTop")?.addEventListener("click", () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
 });
 
 buildDots();
